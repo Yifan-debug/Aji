@@ -1,0 +1,37 @@
+* using log directory 'C:/R/Aji/Aji.Rcheck'
+* using R version 4.2.1 (2022-06-23 ucrt)
+* using platform: x86_64-w64-mingw32 (64-bit)
+* using session charset: UTF-8
+* using options '--no-manual --as-cran'
+* checking for file 'Aji/DESCRIPTION' ... OK
+* checking extension type ... Package
+* this is package 'Aji' version '0.1.0'
+* package encoding: UTF-8
+* checking package namespace information ... OK
+* checking package dependencies ... OK
+* checking if this is a source package ... OK
+* checking if there is a namespace ... OK
+* checking for executable files ... OK
+* checking for hidden files and directories ... OK
+* checking for portable file names ... OK
+* checking serialization versions ... OK
+* checking whether package 'Aji' can be installed ... OK
+* checking installed package size ... OK
+* checking package directory ... OK
+* checking for future file timestamps ... OK
+* checking DESCRIPTION meta-information ... WARNING
+Warning message:
+In normalizePath(path.expand(path), winslash, mustWork) :
+  path[1]="C:/Users/YZW00/OneDrive/??": The filename, directory name, or volume label syntax is incorrect
+Warning message:
+In normalizePath(path.expand(path), winslash, mustWork) :
+  path[1]="C:/Users/YZW00/OneDrive/??": The filename, directory name, or volume label syntax is incorrect
+ ERROR
+Warning message:
+In normalizePath(path.expand(path), winslash, mustWork) :
+  path[1]="C:/Users/YZW00/OneDrive/??": The filename, directory name, or volume label syntax is incorrect
+Warning message:
+In normalizePath(path.expand(path), winslash, mustWork) :
+  path[1]="C:/Users/YZW00/OneDrive/??": The filename, directory name, or volume label syntax is incorrect
+* DONE
+Status: 1 ERROR, 1 WARNING
