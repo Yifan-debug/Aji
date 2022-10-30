@@ -1,0 +1,276 @@
+###import the data from excel####
+library(plantecophys)#convert humidity to water vapor pressure#
+library(randomForest)
+
+####check the normal distribution ####
+qqnorm(mosquito$mosquito, ylab = 'mosquito population')
+qqline(mosquito$mosquito)
+##shapiro.test##
+shapiro.test(mosquito$mosquito)
+
+##z-transformation##
+mosquito$z.mosquito <- ((mosquito$mosquito)-mean(mosquito$mosquito))/sd(mosquito$mosquito)
+qqnorm(mosquito$z.mosquito,ylab = 'mosquito z')
+qqline(mosquito$z.mosquito)
+shapiro.test(mosquito$z.mosquito)
+
+##normalized##
+mosquito$normalized <- (mosquito$mosquito-min(mosquito$mosquito))/(max(mosquito$mosquito)-min(mosquito$mosquito))
+
+qqnorm(mosquito$normalized, ylab = 'mosquito normalized')
+qqline(mosquito$normalized)
+shapiro.test(mosquito$normalized)
+
+###scale()###
+mosquito$scale <- scale(mosquito$mosquito)
+qqnorm(mosquito$scale, ylab = 'mosquito scale')
+qqline(mosquito$scale)
+shapiro.test(mosquito$scale)
+
+
+library(vegan)
+mosquito.hellinger <- decostand(mosquito[,c(3,5:9)], method = 'hellinger')
+
+mvn(mosquito.hellinger, mvnTest=c('mardia'),multivariatePlot=c("qq"))
+
+
+
+
+
+
+library(MVN)##multiple variable normal distribution##
+mvn(mosquito[,c(3,5:9)], mvnTest=c('mardia'),multivariatePlot=c("qq"))
+mvn(mosquito[,c(3,5:9)], mvnTest=c('hz'),multivariatePlot=c("qq"))
+mvn(mosquito[,c(3,5:9)], mvnTest=c('royston'),multivariatePlot=c("qq"))
+
+############################
+RF.all <- randomForest(mosquito~., data= mosquito, importance=T)
+predict.RF.all <- predict(RF.all,mosquito)
+RF.Rsquare  <- rsquare(RF.all, data = mosquito)
+RF.mae <- mae(RF.all, data = mosquito)
+RF.rmse <- rmse(RF.all, data = mosquito)
+RF.nmse<- NMSE(predict.RF.all,mosquito$mosquito)
+RF.MSE <- MSE(predict.RF.all, mosquito$mosquito)
+RF.all$importance
+
+t.test(mosquito$mosquito,predict.RF.all)
+
+true <- mosquito$mosquito
+F1_Score(predict.RF.all,true)
+is.vector(predict.RF.all)
+is.vector(mosquito$mosquito)
+
+actual = c(1,2,28,1,5,6,7,8,9,10)
+predicted = c(1,2,3,4,5,6,7,8,9,10)
+F1_Score(predicted,actual)
+confusionMatric(predicted, actual, positive = "2")
+ConfusionMatrix(predicted, actual)
+
+
+
+ConfusionMatrix(a)
+a <- table(true, predict.RF.all)
+library(caret)
+#### log transformation of the data random forest ######
+RF.z.all <- randomForest(z.mosquito~wind+rain+pressure+daylength+humidity+temperature, data = mosquito, importance=T)
+##z score transformation##
+mosquito$z.mosquito <- ((mosquito$mosquito)-mean(mosquito$mosquito))/sd(mosquito$mosquito)
+predict.z.all <- predict(RF.z.all,mosquito)
+RF.z.Rsquare  <- rsquare(RF.z.all, data = mosquito)
+t.test(mosquito$z.mosquito,predict.z.all)
+
+###############################
+
+##function: Rsquare, MAE, MSE, NMSE######
+
+MAE <- function(predict, observe){
+  mean(abs(predict - observe))
+}
+
+MSE <- function(predict, observe){
+  mean((predict-observe)^2)
+}
+
+NMSE <- function(predict, observe){
+  mean((predict-observe)^2)/mean((mean(observe) - observe)^2)
+}
+
+
+Rsquare <- function(predict,observe){
+  1-var(observe-predict)/var(observe)
+}
+
+mosquito$VPD <- RHtoVPD(mosquito$humidity, mosquito$temperature)
+
+
+
+####split the data with train data and test data######
+select_train <- sample(215, 215*0.8)
+train_data <- mosquito[select_train, ]
+test_data <- mosquito[-select_train, ]
+cycle <- c(1:100)
+library(caret)
+
+###linear model#####
+
+mosquito.lm <- lm(mosquito~wind+rain+daylength+VPD+temperature, data = train_data)
+lm.varimp <- varImp(mosquito.lm)
+predict.lm <- predict(mosquito.lm, test_data)
+lm.Rsquare <- Rsquare(predict.lm, test_data$mosquito)
+lm.MAE <- MAE(predict.lm, test_data$mosquito)
+lm.MSE <- MSE(predict.lm, test_data$mosquito)
+lm.NMSE <- NMSE(predict.lm, test_data$mosquito)
+linearl.model <- c(lm.Rsquare,lm.MAE,lm.MSE,lm.NMSE)
+
+
+#####Generalized linear model ######
+mosquito.glm <- glm(mosquito~wind+rain+daylength+VPD+temperature, data = train_data)
+glm.varimp <- varImp(mosquito.glm)
+predict.glm <- predict(mosquito.glm, test_data)
+glm.Rsquare <- Rsquare(predict.glm, test_data$mosquito)
+glm.MAE <- MAE(predict.glm, test_data$mosquito)
+glm.MSE <- MSE(predict.glm, test_data$mosquito)
+glm.NMSE <- NMSE(predict.glm, test_data$mosquito)
+###same as linear model##
+
+#####Generalized additive model####
+library(mgcv)
+glin <- as.formula(mosquito~s(wind,k=18)+s(rain,k=18)+s(daylength, k=18)+s(VPD, k=18)+s(temperature,k=18))
+mosquito.gam <- gam(glin, data = train_data)
+gam.varimp <- varImp(mosquito.gam)
+predict.gam <- predict(mosquito.gam, test_data)
+gam.Rsquare <- Rsquare(predict.gam, test_data$mosquito)
+gam.MAE <- MAE(predict.gam, test_data$mosquito)
+gam.MSE <- MSE(predict.gam, test_data$mosquito)
+gam.NMSE <- NMSE(predict.gam, test_data$mosquito)
+gam.model <- c(gam.Rsquare,gam.MAE,gam.MSE,gam.NMSE)
+
+
+##locally weighted regression model#####
+mosquito.loess <-  loess(mosquito~wind+daylength+VPD+temperature+rain, train_data)
+loess.varimp <- varImp(mosquito.loess)
+predict.loess <- predict(mosquito.loess, test_data)
+loess.Rsquare <- Rsquare(predict.loess, test_data$mosquito)
+loess.MAE <- MAE(predict.loess, test_data$mosquito)
+loess.MSE <- MSE(predict.loess, test_data$mosquito)
+loess.NMSE<- NMSE(predict.loess, test_data$mosquito)
+
+#########SVR Support vector regression ####
+library(e1071)
+library(astsa)
+library(tseries)
+library(ggplot2)
+library(modelr)
+
+mosquito.svm <- svm(formula=mosquito ~ wind+daylength+VPD+temperature+rain,data=train_data)
+svm.varimp <- varImp(mosquito.svm)
+predict.svm <- predict(mosquito.svm, test_data)
+svm.Rsquare <- Rsquare(predict.svm, test_data$mosquito)
+svm.MAE <- MAE(predict.svm, test_data$mosquito)
+svm.MSE <- MSE(predict.svm, test_data$mosquito)
+svm.NMSE <- NMSE(predict.svm, test_data$mosquito)
+svm.model <- c(svm.Rsquare,svm.MAE,svm.MSE, svm.NMSE)
+library(rminer)
+library(pipeR)
+mosquito.numeric <- mosquito[,c(3,5,6,8,10,15)] %>>% as.matrix()
+mosquito.svm.rminer <- fit(mosquito~wind+daylength+temperature+rain+VPD, mosquito.numeric, model="svm")
+
+Importance(mosquito.svm.rminer,data = mosquito.numeric)
+
+##Decision Trees regression ####
+library(rpart)
+library(rpart.plot)
+
+DTR.all<- rpart(mosquito ~., data = mosquito)
+predict.DTR.all <- predict(DTR.all)
+
+mosquito.dtr <- rpart(mosquito~wind+rain+daylength+VPD+temperature, data = train_data)
+dtr.varimp <- varImp(mosquito.dtr)
+predict.dtr <- predict(mosquito.dtr,test_data)
+dtr.Rsquare <- Rsquare(predict.dtr,test_data$mosquito)
+dtr.MAE <- MAE(predict.dtr, test_data$mosquito)
+dtr.MSE <- MSE(predict.dtr, test_data$mosquito)
+dtr.NMSE <- NMSE(predict.dtr, test_data$mosquito)
+rpart.plot(mosquito.dtr)
+
+dtr.model <- c(dtr.Rsquare,dtr.MAE, dtr.MSE, dtr.NMSE)
+
+
+###Artificial Neural Network ANN ####
+library(ggplot2)
+library(neuralnet)
+library(NeuralNetTools)
+library(ggpol)
+
+mosquito.ann <- neuralnet(mosquito~wind+rain+daylength+VPD+temperature, data = train_data)
+predict.ann <- predict(mosquito.ann, test_data)
+
+
+
+ANN.all <- neuralnet(mosquito~., data = mosquito, hidden = c(5,5),
+                     act.fct = 'logistic',
+                     linear.output = F,
+                     algorithm = 'rprop+')
+
+predict.ANN.all <- predict(ANN.all, mosquito)
+par(cex=0.7)
+plotnet(ANN.all, pos_col='red', neg_col='grey')
+
+
+ANN.Rsquare <- rsquare(ANN.all, mosquito)
+ANN.mae <- mae(ANN.all, data = mosquito)
+ANN.rmse <- rmse(ANN.all, data = mosquito)
+ANN.nmse<- NMSE(predict.ANN.all,mosquito$mosquito)
+
+####random forest#######
+mosquito.rf <- randomForest(mosquito~wind+rain+daylength+VPD+temperature, data = train_data, ntree=1000)
+predict.rf <- predict(mosquito.rf,test_data)
+RF.Rsquare <- Rsquare(predict.rf, test_data$mosquito)
+RF.Rsquare
+rf.varimp <- varImp(mosquito.rf)
+rf.MAE <- MAE(predict.rf, test_data$mosquito)
+rf.MSE <- MSE(predict.rf, test_data$mosquito)
+rf.NMSE <- NMSE(predict.rf, test_data$mosquito)
+rf.model <- c(RF.Rsquare,rf.MAE,rf.MSE, rf.NMSE)
+
+
+
+
+importance.variable <- cbind(lm.varimp,gam.varimp,dtr.varimp,rf.varimp)
+colnames(importance.variable) <-c("lm",'gam','dtr','rf')
+
+prediction <- cbind(predict.lm,predict.gam, predict.dtr, predict.rf, test_data$mosquito)
+model <- cbind(linearl.model, gam.model,dtr.model,rf.model)
+row.names(model) <- c('Rsquare','MAE','MSE','NMSE')
+
+write.csv(prediction, "prediction.csv")
+write.csv(importance.variable,'importance variable.csv')
+write.csv(model, 'model.csv')
+#####bayes MCMC ########
+library(rstan)
+
+####native bayes ######
+library(e1071)
+mosquito.bayes <- naiveBayes(mosquito~wind+rain+daylength+VPD+temperature, data=train_data)
+predict.bayes <- predict(mosquito.bayes, test_data)
+bayes.Rsquare <- Rsquare(predict.bayes, test_data$mosquito)
+#########
+##N-mixed model####
+library(unmarked)
+mosquito.pcount <- pcount(mosquito~wind+rain+deylength+VPD+temperature, data = train_data)
+mosquito.unmarked <- unmarkedFramePCount(y = train_data[,c(5,6,8,10,15)])
+m1 <- pcount(~1 ~1, data=mosquito.unmarked, K=500)
+summary(m1)
+
+
+####non select data########
+
+mosquito.lm <- lm(mosquito~wind+rain+daylength+VPD+temperature, data = mosquito)
+lm.varimp <- varImp(mosquito.lm)
+predict.lm <- predict(mosquito.lm, mosquito)
+lm.Rsquare <- Rsquare(predict.lm, mosquito$mosquito)
+
+mosquito.rf <- randomForest(mosquito~wind+rain+daylength+VPD+temperature, data = mosquito, ntree=1000)
+predict.rf <- predict(mosquito.rf,mosquito)
+RF.Rsquare <- Rsquare(predict.rf, mosquito$mosquito)
+RF.Rsquare
