@@ -3,7 +3,7 @@
     "path": "C:/R/Aji/Aji/DESCRIPTION",
     "project_path": "DESCRIPTION",
     "type": "dcf",
-    "hash": "0",
+    "hash": "2521758965",
     "contents": "",
     "dirty": false,
     "created": 1667148381561.0,
@@ -12,15 +12,15 @@
     "properties": {
         "source_window_id": "",
         "Source": "Source",
-        "cursorPosition": "10,0",
+        "cursorPosition": "6,48",
         "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1667149370,
+    "lastKnownWriteTime": 1667150021,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1667149370079,
+    "last_content_update": 1667150021144,
     "read_only": false,
     "read_only_alternatives": []
 }

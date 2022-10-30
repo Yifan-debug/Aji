@@ -1,4 +1,9 @@
-#' Title
+# NMSE!
+#
+# This is an example function named 'NMSE'
+# which calculae NMSE.
+#'
+#' Title NMSE
 #'
 #' @param predict
 #' @param observe
@@ -7,6 +12,6 @@
 #' @export
 #'
 #' @examples
-NMSE <- function(predict, observe){
+NMSE2 <- function(predict, observe){
   mean((predict-observe)^2)/mean((mean(observe) - observe)^2)
 }

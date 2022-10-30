@@ -1,4 +1,4 @@
-#' Title
+#' Title MAE
 #'
 #' @param predict
 #' @param observe
@@ -7,6 +7,6 @@
 #' @export
 #'
 #' @examples
-MAE <- function(predict, observe){
+MAE2 <- function(predict, observe){
   mean(abs(predict - observe))
 }

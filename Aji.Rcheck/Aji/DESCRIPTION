@@ -1,13 +1,12 @@
 Package: Aji
 Type: Package
-Title: What the Package Does (Title Case)
+Title: modelcompare
 Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Author: yifan wang
+Maintainer: Yifan Wang <yzw0093@auburn.edu>
+Description: This package used for model compare
 License: GNU-3
 Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2022-10-30 16:52:42 UTC; YZW00
-Built: R 4.2.1; ; 2022-10-30 16:52:47 UTC; windows
+Packaged: 2022-10-30 17:17:28 UTC; YZW00
+Built: R 4.2.1; ; 2022-10-30 17:17:34 UTC; windows

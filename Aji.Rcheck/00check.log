@@ -33,5 +33,6 @@ In normalizePath(path.expand(path), winslash, mustWork) :
 Warning message:
 In normalizePath(path.expand(path), winslash, mustWork) :
   path[1]="C:/Users/YZW00/OneDrive/??": The filename, directory name, or volume label syntax is incorrect
+Malformed Description field: should contain one or more complete sentences.
 * DONE
 Status: 1 ERROR, 1 WARNING

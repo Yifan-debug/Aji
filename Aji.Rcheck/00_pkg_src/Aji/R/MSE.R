@@ -1,4 +1,4 @@
-#' Title
+#' Title MSE
 #'
 #' @param predict
 #' @param observe
@@ -7,6 +7,6 @@
 #' @export
 #'
 #' @examples
-MSE <- function(predict, observe){
+MSE2 <- function(predict, observe){
   mean((predict-observe)^2)
 }

@@ -1,4 +1,9 @@
-#' Title NMSE2
+# NMSE!
+#
+# This is an example function named 'NMSE'
+# which calculae NMSE.
+#'
+#' Title NMSE
 #'
 #' @param predict
 #' @param observe

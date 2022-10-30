@@ -1,10 +1,10 @@
 Package: Aji
 Type: Package
-Title: modelcompr
+Title: modelcompare
 Version: 0.1.0
-Author: By the order of Pickyblander 
-Maintainer: YZW0093@auburn.edu
-Description: This package is used for model compare.
+Author: yifan wang
+Maintainer: Yifan Wang <yzw0093@auburn.edu>
+Description: This package used for model compare
 License: GNU-3
 Encoding: UTF-8
 LazyData: true
